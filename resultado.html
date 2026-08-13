@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>O seu diagnóstico | ERA Benfica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>
+  var CHAVE_UNICA = 'diag_erabenfica';
+  var CHAVE_CONSENTIMENTO = 'diag_erabenfica_cookies';
+  var CHAVE_PV = 'diag_erabenfica_pv';
+  var PIXEL_ID = 'AQUI_INSERIR_PIXEL_ID';
+  var PIXEL_ATIVO = PIXEL_ID.indexOf('AQUI') === -1;
+
+  /* 1o, le o sessionStorage */
+  var dadosBrutos = null;
+  try { dadosBrutos = sessionStorage.getItem(CHAVE_UNICA); } catch(e){}
+
+  /* 2o, sem dados, volta ao inicio e nao carrega pixel nenhum */
+  if(!dadosBrutos){
+    window.location.replace('index.html');
+  }
+
+  function temConsentimento(){
+    try { return localStorage.getItem(CHAVE_CONSENTIMENTO) === 'aceite'; }
+    catch(e){ return false; }
+  }
+
+  /* 3o, so com dados e consentimento carrega o pixel, so PageView, uma vez */
+  function carregarPixelResultado(){
+    if(!PIXEL_ATIVO || window.fbq) return;
+    var jaContou = false;
+    try { jaContou = sessionStorage.getItem(CHAVE_PV) === '1'; } catch(e){}
+    if(jaContou) return;
+
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', PIXEL_ID);
+    fbq('track', 'PageView');
+    try { sessionStorage.setItem(CHAVE_PV, '1'); } catch(e){}
+  }
+
+  if(dadosBrutos && temConsentimento()) carregarPixelResultado();
+</script>
+<style>
+  :root{
+    --principal:#002460;
+    --destaque:#b30622;
+    --fundo:#ffffff;
+    --texto:#002460;
+    --cinza:#5b6577;
+    --linha:#e4e7ef;
+    --verde:#1b7a4f;
+    --vermelho:#b30622;
+    --sombra:0 18px 40px rgba(0,36,96,0.10);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;font-family:'Inter',sans-serif;color:var(--texto);
+    background:var(--fundo);-webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{font-family:'Fraunces',serif;margin:0;}
+  p{margin:0;}
+  .envolvente{max-width:640px;margin:0 auto;padding:0 22px 70px;}
+
+  .cabecalho{
+    background:var(--principal);color:#fff;
+    padding:40px 22px 46px;text-align:center;
+  }
+  .cabecalho .rotulo{font-size:14px;font-weight:600;opacity:.85;margin-bottom:14px;}
+  .cabecalho .janela{
+    font-size:clamp(34px,7vw,46px);font-weight:600;letter-spacing:-.02em;
+    line-height:1.1;margin-bottom:12px;
+  }
+  .cabecalho .nota{font-size:15px;opacity:.9;max-width:44ch;margin:0 auto;}
+  .cabecalho .aviso{
+    display:block;margin-top:18px;font-size:12px;opacity:.7;
+  }
+
+  .seccao{padding:38px 0;border-bottom:1px solid var(--linha);}
+  .seccao h2{font-size:20px;font-weight:600;margin-bottom:6px;}
+  .seccao .intro{font-size:14px;color:var(--cinza);margin-bottom:22px;}
+
+  .eixo{margin-bottom:20px;}
+  .eixo-topo{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;}
+  .eixo-nome{font-size:14.5px;font-weight:700;}
+  .eixo-pct{font-size:14px;font-weight:700;}
+  .eixo-legenda{font-size:12.5px;color:var(--cinza);margin-bottom:8px;}
+  .eixo-barra{height:10px;border-radius:999px;background:var(--linha);overflow:hidden;}
+  .eixo-fill{height:100%;border-radius:999px;width:0;transition:width 1.1s ease;}
+  .cor-verde{background:var(--verde);}
+  .cor-terracota{background:#c07a3e;}
+  .cor-vermelho{background:var(--vermelho);}
+
+  .checklist{list-style:none;margin:0;padding:0;}
+  .checklist li{
+    display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--linha);
+  }
+  .checklist li:last-child{border-bottom:none;}
+  .marca{
+    flex-shrink:0;width:22px;height:22px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:13px;font-weight:700;color:#fff;margin-top:1px;
+  }
+  .marca.sim{background:var(--verde);}
+  .marca.nao{background:var(--vermelho);}
+  .doc-texto strong{display:block;font-size:14.5px;font-weight:600;}
+  .doc-texto p{font-size:12.5px;color:var(--cinza);margin-top:3px;}
+  .bloqueia{
+    display:inline-block;margin-top:6px;font-size:10.5px;font-weight:700;
+    color:#fff;background:var(--vermelho);padding:3px 8px;border-radius:5px;
+    letter-spacing:.03em;
+  }
+
+  .travoes-lista{list-style:none;margin:0;padding:0;counter-reset:travao;}
+  .travoes-lista li{
+    counter-increment:travao;position:relative;padding:14px 0 14px 34px;
+    border-bottom:1px solid var(--linha);font-size:14px;line-height:1.55;color:var(--texto);
+  }
+  .travoes-lista li:last-child{border-bottom:none;}
+  .travoes-lista li::before{
+    content:counter(travao);position:absolute;left:0;top:14px;
+    width:22px;height:22px;border-radius:50%;background:var(--vermelho);color:#fff;
+    font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;
+  }
+  .caixa-verde{
+    background:rgba(27,122,79,0.08);border:1px solid rgba(27,122,79,0.25);
+    border-radius:12px;padding:16px 18px;font-size:14px;color:var(--verde);font-weight:600;
+  }
+
+  .passos-lista{list-style:none;margin:0;padding:0;counter-reset:passo;}
+  .passos-lista li{
+    counter-increment:passo;position:relative;padding:14px 0 14px 34px;
+    border-bottom:1px solid var(--linha);font-size:14px;line-height:1.55;
+  }
+  .passos-lista li:last-child{border-bottom:none;}
+  .passos-lista li::before{
+    content:counter(passo);position:absolute;left:0;top:14px;
+    width:22px;height:22px;border-radius:50%;border:1.5px solid var(--principal);
+    color:var(--principal);font-size:12px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;
+  }
+
+  .cta{
+    background:var(--principal);color:#fff;border-radius:18px;
+    padding:34px 26px;text-align:center;margin-top:36px;
+  }
+  .cta h2{color:#fff;font-size:22px;margin-bottom:10px;}
+  .cta p{font-size:14px;opacity:.9;line-height:1.6;margin-bottom:22px;max-width:42ch;margin-left:auto;margin-right:auto;}
+  .cta-botoes{display:flex;flex-direction:column;gap:10px;max-width:320px;margin:0 auto;}
+  .cta-botao{
+    display:flex;align-items:center;justify-content:center;gap:9px;
+    padding:15px 20px;border-radius:11px;font-size:14.5px;font-weight:600;
+    text-decoration:none;
+  }
+  .cta-principal{background:var(--destaque);color:#fff;}
+  .cta-secundario{background:rgba(255,255,255,0.12);color:#fff;border:1.5px solid rgba(255,255,255,0.3);}
+  .cta-botao svg{width:17px;height:17px;flex-shrink:0;}
+</style>
+</head>
+<body>
+
+<div class="cabecalho">
+  <p class="rotulo" id="tituloDiagnostico">O seu diagnóstico</p>
+  <h1 class="janela" id="janelaTempo">A calcular</h1>
+  <p class="nota" id="notaTempo"></p>
+  <span class="aviso">Estimativa indicativa. Não substitui uma avaliação presencial.</span>
+</div>
+
+<div class="envolvente">
+
+  <section class="seccao" id="seccaoEixos">
+    <h2>Os três eixos</h2>
+    <p class="intro">Cada eixo mede uma parte diferente do processo de venda.</p>
+
+    <div class="eixo">
+      <div class="eixo-topo"><span class="eixo-nome">Documentação</span><span class="eixo-pct" id="pctDoc">0%</span></div>
+      <p class="eixo-legenda">Os papéis sem os quais não pode anunciar.</p>
+      <div class="eixo-barra"><div class="eixo-fill" id="fillDoc"></div></div>
+    </div>
+
+    <div class="eixo">
+      <div class="eixo-topo"><span class="eixo-nome">Acordo e Titularidade</span><span class="eixo-pct" id="pctAcordo">0%</span></div>
+      <p class="eixo-legenda">Quem tem de dizer sim antes da escritura.</p>
+      <div class="eixo-barra"><div class="eixo-fill" id="fillAcordo"></div></div>
+    </div>
+
+    <div class="eixo">
+      <div class="eixo-topo"><span class="eixo-nome">Prontidão e Momento</span><span class="eixo-pct" id="pctPront">0%</span></div>
+      <p class="eixo-legenda">O seu timing e a situação atual do anúncio.</p>
+      <div class="eixo-barra"><div class="eixo-fill" id="fillPront"></div></div>
+    </div>
+  </section>
+
+  <section class="seccao" id="seccaoChecklist">
+    <h2>Checklist de documentos</h2>
+    <p class="intro" id="subChecklist">A verificar.</p>
+    <ul class="checklist" id="listaChecklist"></ul>
+  </section>
+
+  <section class="seccao" id="seccaoTravoes">
+    <h2>O que está a travar a sua venda</h2>
+    <p class="intro">Os pontos que mais atrasam o processo, por ordem de gravidade.</p>
+    <div id="conteudoTravoes"></div>
+  </section>
+
+  <section class="seccao" id="seccaoPassos" style="border-bottom:none;">
+    <h2>O que fazer a seguir</h2>
+    <p class="intro">Ordenado para o seu caso concreto.</p>
+    <ol class="passos-lista" id="listaPassos"></ol>
+  </section>
+
+  <div class="cta">
+    <h2 id="tituloCta">Quer saber quanto vale mesmo a sua casa</h2>
+    <p id="textoCta">O diagnóstico mostra o que está a atrasar a venda. A avaliação gratuita da ERA Benfica é a única forma de saber o preço certo.</p>
+    <div class="cta-botoes">
+      <a class="cta-botao cta-principal" href="tel:+351969567015">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        Ligar agora
+      </a>
+      <a class="cta-botao cta-secundario" href="https://www.instagram.com/eraportugal/" target="_blank" rel="noopener">
+        Seguir no Instagram
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var dados = null;
+  try {
+    var bruto = sessionStorage.getItem(CHAVE_UNICA);
+    if(bruto) dados = JSON.parse(bruto);
+  } catch(e){}
+
+  if(!dados){ return; }
+
+  var A = dados.A, D = dados.D;
+  var primeiroNome = (A.nome || '').trim().split(/\s+/)[0] || '';
+
+  document.getElementById('tituloDiagnostico').textContent = 'O seu diagnóstico' + (primeiroNome ? ', ' + primeiroNome : '');
+  document.getElementById('janelaTempo').textContent = D.tempo_estimado;
+  document.getElementById('notaTempo').textContent = D.nota_tempo;
+
+  function corPorPct(p){
+    if(p >= 70) return 'cor-verde';
+    if(p >= 45) return 'cor-terracota';
+    return 'cor-vermelho';
+  }
+  function animarEixo(pct, idFill, idPct){
+    document.getElementById(idPct).textContent = pct + '%';
+    var fill = document.getElementById(idFill);
+    fill.classList.add(corPorPct(pct));
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){ fill.style.width = pct + '%'; });
+    });
+  }
+  animarEixo(D.score_documentacao, 'fillDoc', 'pctDoc');
+  animarEixo(D.score_acordo, 'fillAcordo', 'pctAcordo');
+  animarEixo(D.score_prontidao, 'fillPront', 'pctPront');
+
+  /* Checklist de documentos */
+  var explicacoes = {
+    'Caderneta predial': 'Pede se nas Finanças, é gratuita e rápida.',
+    'Certidão permanente do registo': 'Pede se online, no site do registo predial.',
+    'Licença de utilização': 'Pede se na câmara municipal da área do imóvel.',
+    'Certificado energético': 'Emitido por um perito qualificado, é obrigatório por lei.'
+  };
+  var lista = document.getElementById('listaChecklist');
+  var faltamCount = 0;
+  Object.keys(D.docs_estado).forEach(function(nome){
+    var tem = D.docs_estado[nome];
+    if(!tem) faltamCount++;
+    var li = document.createElement('li');
+    var bloqueia = (nome === 'Certificado energético' && !tem) ? '<span class="bloqueia">Bloqueia o anúncio</span>' : '';
+    li.innerHTML =
+      '<span class="marca ' + (tem ? 'sim' : 'nao') + '">' + (tem ? '✓' : '✕') + '</span>' +
+      '<span class="doc-texto"><strong>' + nome + '</strong><p>' + explicacoes[nome] + '</p>' + bloqueia + '</span>';
+    lista.appendChild(li);
+  });
+  document.getElementById('subChecklist').textContent =
+    faltamCount === 0 ? 'Tem tudo.' : ('Faltam lhe ' + faltamCount + (faltamCount === 1 ? ' documento.' : ' documentos.'));
+
+  /* Travoes */
+  var contTravoes = document.getElementById('conteudoTravoes');
+  if(D.travoes.length === 0){
+    contTravoes.innerHTML = '<p class="caixa-verde">Não identificámos travões críticos.</p>';
+  } else {
+    var ol = document.createElement('ol');
+    ol.className = 'travoes-lista';
+    D.travoes.forEach(function(t){
+      var li = document.createElement('li');
+      li.textContent = t;
+      ol.appendChild(li);
+    });
+    contTravoes.appendChild(ol);
+  }
+
+  /* Proximos passos */
+  var listaPassos = document.getElementById('listaPassos');
+  D.passos.forEach(function(p){
+    var li = document.createElement('li');
+    li.textContent = p;
+    listaPassos.appendChild(li);
+  });
+
+  /* CTA dinamico */
+  if(A.avaliacao === 'Sim, quero marcar'){
+    document.getElementById('tituloCta').textContent = 'Já sabemos que quer marcar a avaliação';
+    document.getElementById('textoCta').textContent = 'Recebemos o seu pedido. A nossa equipa entra em contacto consigo nas próximas 48 horas.';
+  }
+
+  var tel = document.querySelector('.cta-principal');
+  if(tel) tel.setAttribute('aria-label', 'Ligar para a ERA Benfica');
+})();
+</script>
+</body>
+</html>
